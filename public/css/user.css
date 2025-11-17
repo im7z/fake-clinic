@@ -281,3 +281,100 @@ table td, table th {
   background: #005fc4;
 }
 
+/* === Mobile Fixes === */
+@media (max-width: 576px) {
+
+  body {
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .container {
+    margin: 10px;
+    padding: 15px;
+    border-radius: 12px;
+  }
+
+  /* Navbar Mobile Fixes */
+  .navbar {
+    flex-direction: column !important;
+    text-align: center;
+    padding: 14px 10px;
+  }
+
+  .navbar .nav-left h2 {
+    font-size: 18px;
+  }
+
+  .navbar .nav-right {
+    margin-top: 10px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .navbar .nav-right a {
+    font-size: 14px;
+    margin: 6px;
+  }
+
+  .navbar .logout {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  /* Cards on Phones */
+  .card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 12px;
+  }
+
+  .card p {
+    font-size: 14px;
+  }
+
+  /* Small Appointment Cards */
+  .small-card {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* Buttons */
+  .btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+
+  /* Grid Adjustments for Doctors */
+  .grid {
+    grid-template-columns: 1fr !important; /* One per row on phone */
+  }
+
+  /* Tables Fix */
+  table {
+    font-size: 13px;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  table th, table td {
+    padding: 8px !important;
+  }
+
+  /* Input Fields */
+  input {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* Modals */
+  .modal-content {
+    padding: 10px;
+  }
+}
