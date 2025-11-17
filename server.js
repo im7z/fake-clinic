@@ -155,8 +155,8 @@ app.get("/admin/performance", (req, res) => {
 });
 
 
-// // === Start Server ===
-// app.listen(PORT, () =>
-//   console.log(`🏥 Fake Clinic running on http://localhost:${PORT}`)
-// );
+// === Start Server ===
+app.listen(PORT, () =>
+  console.log(`🏥 Fake Clinic running on http://localhost:${PORT}`)
+);
 
