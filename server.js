@@ -5,7 +5,7 @@ const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = process.env.PORT || 4000;
 const BACKEND_API = process.env.BACKEND_API || "https://appointment-system-iw83.onrender.com";
-
+process.env.TZ = "Asia/Riyadh";
 // === MongoDB ===
 const MONGO_URL = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/fakeClinic";
 mongoose.connect(MONGO_URL);
