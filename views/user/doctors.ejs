@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Select Doctor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/user.css">
+</head>
+
+<body class="bg-light">
+  <%- include('../partials/_navbar', { userName, phone, page: 'doctors' }) %>
+
+    <div class="container mt-4">
+      <h3 class="mb-3">👩‍⚕️ Choose Your Doctor</h3>
+      <input type="text" id="search" class="form-control mb-3" placeholder="Search doctor by name...">
+
+      <div id="doctorList" class="grid"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/user.js"></script>
+    <script>
+      setupDoctorsPage("<%= API %>", "<%= userName %>", "<%= phone %>");
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/admin/dashboard">🏥 Admin Panel</a>
+    <div class="navbar-nav">
+      <a class="nav-link <%= page === 'dashboard' ? 'active' : '' %>" href="/admin/dashboard">Dashboard</a>
+      <a class="nav-link <%= page === 'add-block' ? 'active' : '' %>" href="/admin/add-block">Available</a>
+      <a class="nav-link <%= page === 'booked' ? 'active' : '' %>" href="/admin/booked">Booked</a>
+      <a class="nav-link <%= page === 'baseline' ? 'active' : '' %>" href="/admin/baseline">Baseline</a>
+      <a class="nav-link <%= page === 'performance' ? 'active' : '' %>" href="/admin/performance">Performance</a>
+      <a class="nav-link text-danger" href="/login">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Admin Popup Modal -->
+<div class="modal fade" id="adminPopup" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="adminPopupTitle">تنبيه</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- FIX: RTL direction for Arabic messages -->
+      <div class="modal-body" style="direction: rtl; text-align: right;">
+        <p id="adminPopupText"></p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">حسناً</button>
+      </div>
+
+    </div>
+  </div>
+</div>
