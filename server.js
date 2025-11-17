@@ -4,7 +4,7 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const app = express();
 const PORT = process.env.PORT || 4000;
-const BACKEND_API = process.env.BACKEND_API || "http://localhost:3000";
+const BACKEND_API = process.env.BACKEND_API || "https://appointment-system-iw83.onrender.com";
 
 // === MongoDB ===
 const MONGO_URL = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/fakeClinic";
@@ -155,8 +155,8 @@ app.get("/admin/performance", (req, res) => {
 });
 
 
-// === Start Server ===
-app.listen(PORT, () =>
-  console.log(`🏥 Fake Clinic running on http://localhost:${PORT}`)
-);
+// // === Start Server ===
+// app.listen(PORT, () =>
+//   console.log(`🏥 Fake Clinic running on http://localhost:${PORT}`)
+// );
 
