@@ -71,18 +71,37 @@ function setupAvailablePage(API, userName, phone) {
 
       box.innerHTML = myApps
         .map(app => {
-          const date = new Date(app.date).toLocaleString();
+          const d = new Date(app.date);
+
+          const time = d.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+
+          const monthDay = d.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric"
+          });
+
+          const weekday = d.toLocaleDateString("en-US", {
+            weekday: "long"
+          });
+
+          const finalDate = `${monthDay} - ${weekday}`;
+
           return `
-            <div class="card small-card">
-              <div class="card-content">
-                <p><b>${app.doctorName}</b></p>
-                <p><small>${date}</small></p>
-              </div>
-              <span class="status booked">booked</span>
-            </div>
-          `;
+      <div class="card small-card">
+        <div class="card-content">
+          <p><b>${app.doctorName}</b></p>
+          <p><small>${time}</small></p>
+          <p><small>${finalDate}</small></p>
+        </div>
+        <span class="status booked">booked</span>
+      </div>
+    `;
         })
         .join("");
+
     } catch (err) {
       console.error("Error loading appointments:", err);
       box.innerHTML = `<p style="color:red;">Failed to load appointments.</p>`;
@@ -143,10 +162,10 @@ function setupDoctorsPage(API, userName, phone) {
         list.innerHTML = docs
           .map(
             d => `
-              <div class="card" onclick="selectDoctor('${d.name}')">
-                <h5>${d.name}</h5>
-                <small class="text-muted">${d.specialty}</small>
-              </div>
+             <div class="doctor-card" onclick="selectDoctor('${d.name}')">
+  <h5>${d.name}</h5>
+  <small class="text-muted">${d.specialty}</small>
+</div>
             `
           )
           .join("");
@@ -189,13 +208,35 @@ function setupTimesPage(API, doctor, userName, phone) {
 
       slotsDiv.innerHTML = slots
         .map(s => {
-          const date = new Date(s.date).toLocaleString();
+          const d = new Date(s.date);
+
+          const time = d.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+
+          const monthDay = d.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric"
+          });
+
+          const weekday = d.toLocaleDateString("en-US", {
+            weekday: "long"
+          });
+
+          const finalDate = `${monthDay} • ${weekday}`;
+
           return `
-            <div class="card">
-              <p><b>${date}</b></p>
-              <button class="btn btn-primary btn-sm" onclick="bookSlot('${s._id}')">Book</button>
-            </div>
-          `;
+      <div class="time-card">
+        <div class="time-content">
+          <p class="time-hour">${time}</p>
+          <p class="time-date">${finalDate}</p>
+        </div>
+        <button class="btn btn-primary btn-sm w-100 mt-2" onclick="bookSlot('${s._id}')">
+          Book
+        </button>
+      </div>
+    `;
         })
         .join("");
     } catch (err) {
@@ -257,7 +298,7 @@ function setupTimesPage(API, doctor, userName, phone) {
         window.location.href = `/user/available?userName=${encodeURIComponent(
           userName
         )}&phone=${encodeURIComponent(phone)}`;
-      }, 800);
+      }, 2500);
     } catch (err) {
       console.error("Booking failed:", err);
       showUserPopup("فشل حجز الموعد، الرجاء المحاولة مرة أخرى.", "خطأ");
@@ -276,10 +317,10 @@ function setupPastPage(API, userName, phone) {
   const list = document.getElementById("pastList");
 
   const filterBar = document.createElement("div");
-  filterBar.className = "mb-3 text-center";
+  filterBar.className = "d-flex justify-content-center gap-2 mb-3 flex-wrap";
   filterBar.innerHTML = `
-    <button class="btn btn-outline-primary btn-sm me-2" id="showAll">All</button>
-    <button class="btn btn-outline-success btn-sm me-2" id="showAttended">Attended</button>
+    <button class="btn btn-outline-primary btn-sm " id="showAll">All</button>
+    <button class="btn btn-outline-success btn-sm " id="showAttended">Attended</button>
     <button class="btn btn-outline-danger btn-sm" id="showMissed">Missed</button>
   `;
   list.parentNode.insertBefore(filterBar, list);
@@ -316,23 +357,39 @@ function setupPastPage(API, userName, phone) {
 
     list.innerHTML = apps
       .map(app => {
-        const date = new Date(app.date).toLocaleString();
-        const color =
-          app.status === "attended"
-            ? "success"
-            : app.status === "missed"
-              ? "danger"
+        const d = new Date(app.date);
+
+        const time = d.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+        const monthDay = d.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric"
+        });
+
+        const weekday = d.toLocaleDateString("en-US", {
+          weekday: "long"
+        });
+
+        const finalDate = `${monthDay} • ${weekday}`;
+
+        const tagColor =
+          app.status === "attended" ? "success"
+            : app.status === "missed" ? "danger"
               : "secondary";
 
         return `
-          <div class="card d-flex justify-content-between align-items-center flex-wrap">
-            <div>
-              <p class="mb-"><b>${app.doctorName}</b></p>
-              <small class="text-muted">${date}</small>
-            </div>
-            <span class="badge bg-${color}">${app.status}</span>
-          </div>
-        `;
+      <div class="past-card">
+        <div class="past-left">
+          <p class="past-doctor">${app.doctorName}</p>
+          <p class="past-date">${finalDate}</p>
+          <p class="past-time">${time}</p>
+        </div>
+        <span class="badge bg-${tagColor} past-badge">${app.status}</span>
+      </div>
+    `;
       })
       .join("");
   }
@@ -365,16 +422,27 @@ function setupLoyaltyPage(API, userName) {
       const user = await res.json();
 
       info.innerHTML = `
-        <h4>${user.score ?? 0} Points</h4>
-        <div class="card p-3 mt-3">
-          <h6>🎁 Use your points for rewards:</h6>
-          <ul class="list-unstyled mb-0">
-            <li>💸 10 pts → 5% Discount</li>
-            <li>🩺 20 pts → Free Service</li>
-            <li>🎉 30 pts → Premium Priority Slot</li>
-          </ul>
-        </div>
-      `;
+  <h4>${user.score ?? 0} Points</h4>
+
+  <div class="reward-card-list mt-3">
+
+    <div class="reward-card">
+      <div class="reward-points">10 pts</div>
+      <div class="reward-desc">5% Discount on next appointment</div>
+    </div>
+
+    <div class="reward-card">
+      <div class="reward-points"> 20 pts</div>
+      <div class="reward-desc">One Free Clinic Service</div>
+    </div>
+
+    <div class="reward-card">
+      <div class="reward-points"> 30 pts</div>
+      <div class="reward-desc">Premium Priority Appointment Slot</div>
+    </div>
+
+  </div>
+`;
     } catch (err) {
       console.error("Failed to load points:", err);
       info.innerHTML =

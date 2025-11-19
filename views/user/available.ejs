@@ -13,14 +13,17 @@
   <%- include('../partials/_navbar', { userName, phone, page: 'available' }) %>
 
     <div class="container mt-4">
-      <h3 class="text-center mb-3">Welcome, <%= userName %> 👋</h3>
+      <h3 class="text-center mb-3">Welcome, <%= userName %>
+      </h3>
 
-      <div class="card p-3 shadow-sm mb-3">
-        <h5>📅 Your Upcoming Appointments</h5>
-        <div id="appointmentBox" class="mt-2">Loading...</div>
+      <div class=" card p-3 shadow-sm mb-3">
+        <h5 class="text-center"> Your Upcoming Appointments</h5>
       </div>
 
-      <div class="text-center">
+      <div class="text-center appointment-grid mt-3" id="appointmentBox">
+        Loading...
+      </div>
+      <div class="text-center mt-3">
         <button id="bookBtn" class="btn btn-primary btn-lg">➕ Book New Appointment</button>
       </div>
 

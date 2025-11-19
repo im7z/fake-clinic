@@ -41,14 +41,40 @@ function setupAttendance() {
     }
 
     userApps.forEach((a) => {
-      const date = new Date(a.date).toLocaleString();
+      const d = new Date(a.date);
+
+      const time = d.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+      const monthDay = d.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric"
+      });
+
+      const weekday = d.toLocaleDateString("en-US", {
+        weekday: "long"
+      });
+
+      const finalDate = `${monthDay} • ${weekday}`;
+
       container.innerHTML += `
-        <div class="border rounded p-2 mb-2">
-          <b>${a.doctorName}</b> — ${date}<br>
-          <button class="btn btn-success btn-sm me-2" onclick="markStatus('${a._id}','attended')">Attended</button>
-          <button class="btn btn-danger btn-sm" onclick="markStatus('${a._id}','missed')">Missed</button>
-        </div>`;
+  <div class="attendance-card">
+    <div class="attendance-left">
+      <p class="attendance-doctor">${a.doctorName}</p>
+      <p class="attendance-date">${new Date(a.date).toLocaleString()}</p>
+    </div>
+
+    <div class="attendance-actions">
+      <button class="btn btn-success btn-sm" onclick="markStatus('${a._id}','attended')">Attended</button>
+      <button class="btn btn-danger btn-sm" onclick="markStatus('${a._id}','missed')">Missed</button>
+    </div>
+  </div>
+`;
+
     });
+
   });
 }
 
@@ -153,53 +179,89 @@ async function loadAvailableSlots() {
 
 
 // =======================================================
-//   3) BOOKED PAGE
+//   3) BOOKED PAGE (UPGRADED TO CARD VIEW)
 // =======================================================
 async function loadBooked() {
+  const container = document.getElementById("bookedList"); // <div id="bookedList">
+  container.innerHTML = "Loading...";
+
   const res = await fetch(`${API}/appointments/booked`);
   const json = await res.json();
-  const tbody = document.querySelector("#bookedTable tbody");
-  tbody.innerHTML = "";
 
   if (!json.appointments || json.appointments.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="text-center">No booked appointments found.</td></tr>`;
+    container.innerHTML = `<p class="text-muted">No booked appointments found.</p>`;
     return;
   }
 
-  json.appointments.forEach((a, index) => {
-    const date = new Date(a.date).toLocaleString("en-US");
-    const collapseId = `reminders-${index}`;
+  container.innerHTML = json.appointments
+    .map((a, index) => {
+      const d = new Date(a.date);
 
-    const remindersHTML =
-      a.reminders && a.reminders.length
-        ? a.reminders.map(r => `
-          <div class="border rounded p-2 mb-1 bg-light">
-            <div class="d-flex justify-content-between">
-              <span class="badge bg-info text-dark">${r.messageType}</span>
-              <span class="badge bg-${r.status === "sent" ? "success" : "warning"}">${r.status}</span>
-            </div>
-            <small class="text-muted">${new Date(r.sendTime).toLocaleString()}</small>
-          </div>`).join("")
-        : "<em>No reminders</em>";
+      const time = d.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
 
-    tbody.innerHTML += `
-      <tr>
-        <td>${a.doctorName}</td>
-        <td>${a.userName || "-"}</td>
-        <td>${date}</td>
-        <td><span class="badge bg-${a.status === "booked" ? "primary" : a.status === "attended" ? "success" : "danger"}">${a.status}</span></td>
-        <td>
-          <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#${collapseId}">
-            View Reminders
-          </button>
-          <div class="collapse mt-2" id="${collapseId}">${remindersHTML}</div>
-        </td>
-      </tr>
+      const monthDay = d.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric"
+      });
+
+      const weekday = d.toLocaleDateString("en-US", {
+        weekday: "long"
+      });
+
+      const finalDate = `${monthDay} - ${weekday}`;
+
+      const reminderID = `rem-${index}`;
+
+      const remindersHTML =
+        a.reminders && a.reminders.length
+          ? a.reminders
+            .map(
+              r => `
+          <div class="reminder-item">
+            <span class="badge bg-info text-dark">${r.messageType}</span>
+            <span class="badge bg-${r.status === "sent" ? "success" : "warning"}">${r.status}</span>
+            <small class="d-block mt-1">${new Date(r.sendTime).toLocaleString()}</small>
+          </div>
+        `
+            )
+            .join("")
+          : `<small class="text-muted">No reminders</small>`;
+
+      return `
+      <div class="text-center card small-card shadow-sm">
+        <div class="card-content">
+          <p><b>${a.doctorName}</b></p>
+          <p><small>User: ${a.userName || "-"}</small></p>
+          <p><small>${time}</small></p>
+          <p><small>${finalDate}</small></p>
+        </div>
+
+        <span class="status booked mb-2">booked</span>
+
+        <button class="btn btn-sm btn-outline-secondary mt-2"
+                data-bs-toggle="collapse"
+                data-bs-target="#${reminderID}">
+          View Reminders
+        </button>
+
+        <div class="collapse mt-2" id="${reminderID}">
+          ${remindersHTML}
+        </div>
+      </div>
     `;
-  });
+    })
+    .join("");
 }
 
 
+function to12Hour(hour) {
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const h = hour % 12 || 12;
+  return `${h}:00 ${suffix}`;
+}
 // =======================================================
 //   4) BASELINE PAGE (High-Demand)
 // =======================================================
@@ -275,8 +337,9 @@ window.viewDoctorMonths = async function (doctorName) {
           <p>No baseline data.</p>
           <button class="btn btn-sm btn-primary mt-2" onclick="openBaselineModal('${doctorName}', ${year}, ${i})">Add Baseline</button>`;
       } else {
+
         const badges = info.rows
-          .map(r => `<span class="badge bg-primary me-1">${r.hour}:00</span>`)
+          .map(r => `<span class="badge bg-primary me-1">${to12Hour(r.hour)}</span>`)
           .join("");
 
         box.innerHTML = `

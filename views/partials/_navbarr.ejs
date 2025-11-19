@@ -1,16 +1,43 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/admin/dashboard">🏥 Admin Panel</a>
-    <div class="navbar-nav">
-      <a class="nav-link <%= page === 'dashboard' ? 'active' : '' %>" href="/admin/dashboard">Dashboard</a>
-      <a class="nav-link <%= page === 'add-block' ? 'active' : '' %>" href="/admin/add-block">Available</a>
-      <a class="nav-link <%= page === 'booked' ? 'active' : '' %>" href="/admin/booked">Booked</a>
-      <a class="nav-link <%= page === 'baseline' ? 'active' : '' %>" href="/admin/baseline">Baseline</a>
-      <a class="nav-link <%= page === 'performance' ? 'active' : '' %>" href="/admin/performance">Performance</a>
-      <a class="nav-link text-danger" href="/login">Logout</a>
+
+    <a class="navbar-brand fw-semibold" href="/admin/dashboard">
+       QU Admin Panel
+    </a>
+
+    <!-- Mobile Toggle Button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav"
+      aria-controls="adminNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapsible Content -->
+    <div class="collapse navbar-collapse" id="adminNav">
+
+      <div class="navbar-nav ms-auto">
+
+        <a class="nav-link <%= page === 'dashboard' ? 'active' : '' %>"
+          href="/admin/dashboard">Dashboard</a>
+
+        <a class="nav-link <%= page === 'add-block' ? 'active' : '' %>"
+          href="/admin/add-block">Available</a>
+
+        <a class="nav-link <%= page === 'booked' ? 'active' : '' %>"
+          href="/admin/booked">Booked</a>
+
+        <a class="nav-link <%= page === 'baseline' ? 'active' : '' %>"
+          href="/admin/baseline">Baseline</a>
+
+        <a class="nav-link <%= page === 'performance' ? 'active' : '' %>"
+          href="/admin/performance">Performance</a>
+
+        <a class="nav-link text-danger fw-semibold" href="/login">Logout</a>
+
+      </div>
     </div>
   </div>
 </nav>
+
 
 <!-- Admin Popup Modal -->
 <div class="modal fade" id="adminPopup" tabindex="-1" aria-hidden="true">

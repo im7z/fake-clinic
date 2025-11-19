@@ -18,7 +18,9 @@ body {
 }
 
 /* === Headings === */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-weight: 600;
   color: #2c3e50;
 }
@@ -42,7 +44,7 @@ h2 {
   background: #007bff;
   color: white;
   padding: 12px 24px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .navbar .nav-left h2 {
@@ -101,7 +103,7 @@ h2 {
   border-radius: 12px;
   padding: 12px 16px;
   margin: 10px 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -111,7 +113,7 @@ h2 {
 
 .card:hover {
   transform: scale(1.02);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card p {
@@ -191,11 +193,19 @@ input {
 
 /* === Subtle Animations === */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.card, .btn {
+.card,
+.btn {
   animation: fadeIn 0.3s ease-in-out;
 }
 
@@ -205,39 +215,18 @@ input {
     flex-direction: column;
     text-align: center;
   }
+
   .navbar .nav-right {
     margin-top: 8px;
   }
+
   .navbar .nav-right a {
     display: inline-block;
     margin: 6px 10px;
   }
 }
 
-/* === Loyalty Rewards Section === */
-.reward-card {
-  background: #f8fbff;
-  border: 1px solid #e3ecf9;
-  border-radius: 14px;
-  padding: 18px;
-  transition: all 0.3s ease;
-}
 
-.reward-card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-}
-
-.reward-card h5 {
-  color: #007bff;
-  margin-bottom: 8px;
-}
-
-.reward-card p {
-  font-size: 15px;
-  color: #555;
-  margin-bottom: 12px;
-}
 
 /* === Tables (Admin Pages) === */
 table {
@@ -252,7 +241,8 @@ table th {
   font-weight: 500;
 }
 
-table td, table th {
+table td,
+table th {
   vertical-align: middle !important;
   text-align: center;
 }
@@ -261,7 +251,7 @@ table td, table th {
 .modal-content {
   border-radius: 14px;
   border: none;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .modal-content h5 {
@@ -352,7 +342,8 @@ table td, table th {
 
   /* Grid Adjustments for Doctors */
   .grid {
-    grid-template-columns: 1fr !important; /* One per row on phone */
+    grid-template-columns: 1fr !important;
+    /* One per row on phone */
   }
 
   /* Tables Fix */
@@ -363,7 +354,8 @@ table td, table th {
     white-space: nowrap;
   }
 
-  table th, table td {
+  table th,
+  table td {
     padding: 8px !important;
   }
 
@@ -377,4 +369,366 @@ table td, table th {
   .modal-content {
     padding: 10px;
   }
+}
+
+/* Appointment grid layout */
+.appointment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+/* Make cards fill grid properly */
+.appointment-grid .small-card {
+  width: 100%;
+  margin: 0;
+}
+
+/* FIX: Bootstrap card block behavior */
+.appointment-grid .card {
+  display: flex !important;
+  flex-direction: column;
+}
+
+/* Force appointment cards to behave correctly inside the grid */
+.appointment-grid .card.small-card {
+  display: block !important;
+  width: 100% !important;
+  flex-wrap: unset !important;
+  justify-content: unset !important;
+  align-items: unset !important;
+}
+
+/* Doctor cards (Fix alignment + center text) */
+.doctor-card {
+  background: #f8fbff;
+  border: 1px solid #e6eef8;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  text-align: center;
+  /* Center text */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.doctor-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.doctor-card h5 {
+  margin-bottom: 8px;
+  font-size: 18px;
+  color: #007bff;
+}
+
+.doctor-card small {
+  color: #555;
+  font-size: 14px;
+}
+
+/* Time Slot Cards */
+.time-card {
+  background: #ffffff;
+  border: 1px solid #e6eef8;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.time-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+}
+
+.time-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.time-hour {
+  font-size: 18px;
+  font-weight: 600;
+  color: #007bff;
+  margin: 0;
+}
+
+.time-date {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+/* Grid fix so time cards align correctly */
+.grid .time-card {
+  width: 100%;
+}
+
+/* Past Appointment Card */
+.past-card {
+  background: #ffffff;
+  border: 1px solid #e6eef8;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.past-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.past-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.past-doctor {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0;
+  color: #007bff;
+}
+
+.past-date {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.past-time {
+  font-size: 14px;
+  color: #444;
+  margin: 0;
+}
+
+.past-badge {
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+
+/* Loyalty Reward Cards (Fully Centered on All Screens) */
+.reward-card-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* center cards on phone */
+  justify-content: center;
+  gap: 16px;
+  margin-top: 15px;
+}
+
+.reward-card {
+  background: #ffffff;
+  border: 1px solid #e6eef8;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  width: 100%;
+  max-width: 340px;
+  /* perfect width for phone & desktop */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-left: auto;
+  /* force centering */
+  margin-right: auto;
+  /* force centering */
+}
+
+.reward-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.reward-points {
+  font-size: 18px;
+  font-weight: 700;
+  color: #007bff;
+  margin-bottom: 6px;
+}
+
+.reward-desc {
+  font-size: 15px;
+  color: #555;
+}
+
+/* Tablet: Display 2 columns, centered */
+@media (min-width: 700px) {
+  .reward-card-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+}
+
+/* Fix the loyalty container so it's NOT a flex card */
+#pointsInfo.card {
+  display: block !important;
+  text-align: center;
+  justify-content: initial;
+  align-items: initial;
+  flex-wrap: initial;
+}
+
+/* Make sure the reward list uses full width inside the box */
+#pointsInfo .reward-card-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ================================
+   ADMIN — Attendance List Layout
+================================ */
+
+/* One card per row, centered */
+.attendance-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* Beautiful card like user UI */
+.attendance-card {
+  background: #ffffff;
+  border: 1px solid #e6eef8;
+  border-radius: 12px;
+  padding: 16px;
+
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.07);
+  transition: 0.2s ease-in-out;
+}
+
+.attendance-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.10);
+}
+
+/* Left Section */
+.attendance-left p {
+  margin: 0;
+  padding: 2px 0;
+}
+
+.attendance-doctor {
+  font-weight: 700;
+  font-size: 17px;
+  color: #007bff;
+}
+
+.attendance-date {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Right side – buttons */
+.attendance-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Mobile Fix */
+@media (max-width: 576px) {
+  .attendance-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .attendance-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+/* Responsive fix for admin booked table */
+.booked-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  border-radius: 12px;
+  background: white;
+}
+
+#bookedTable {
+  min-width: 650px;
+  /* prevents the table from collapsing on phones */
+  border-radius: 12px;
+}
+
+/* iPhone table style improvements */
+@media (max-width: 576px) {
+
+  #bookedTable th,
+  #bookedTable td {
+    padding: 8px !important;
+    font-size: 10px;
+    white-space: nowrap;
+    /* keeps text in one line */
+  }
+
+  #bookedTable button {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+.reminder-item {
+  padding: 6px;
+  background: #f7faff;
+  border: 1px solid #e6eef8;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+/* Summary Cards */
+.stat-card {
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e6eef8;
+  transition: 0.2s;
+}
+
+.stat-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* User Filters */
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* Mobile fix for table */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
