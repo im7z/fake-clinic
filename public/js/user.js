@@ -267,7 +267,7 @@ function setupTimesPage(API, doctor, userName, phone) {
         );
         return (window.location.href = `/connect-telegram?name=${encodeURIComponent(
           userName
-        )}`);
+        )}&phone=${encodeURIComponent(phone)}`);
       }
 
       // 2️⃣ Book the appointment

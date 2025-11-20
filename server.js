@@ -12,10 +12,11 @@ mongoose.connect(MONGO_URL);
 
 // === Model ===
 const UserSchema = new mongoose.Schema({
-  name: String,
-  phone: { type: String, unique: true },
+  name: { type: String, unique: true }, // Username used for login (must be unique)
+  displayName: String, // Display name shown in the UI (can contain spaces)
+  phone: String,
   password: String,
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },// Date when user was created
 });
 const ClinicUser = mongoose.model("ClinicUser", UserSchema);
 
@@ -38,32 +39,75 @@ app.get("/signup", (req, res) => {
   res.render("signup", { error: null });
 });
 
-// Handle signup
+// === Handle Signup ===
 app.post("/signup", async (req, res) => {
-  const { name, phone, password } = req.body;
-  if (!name || !phone || !password)
-    return res.render("signup", { error: "All fields required" });
+  const { name, displayName, phone, password } = req.body;
+  try {
+    // 1) Required fields
+    if (!name || !displayName || !phone || !password) {
+      return res.render("signup", { error: "All fields are required" });
+    }
 
-  const exists = await ClinicUser.findOne({ phone });
-  if (exists)
-    return res.render("signup", { error: "Phone already registered!" });
+    // 2) Username must not contain spaces
+    if (/\s/.test(name)) {
+      return res.render("signup", {
+        error: "Username cannot contain spaces."
+      });
+    }
 
-  const hash = await bcrypt.hash(password, 10);
+    // 3) Convert username to lowercase for storage
+    const normalizedUsername = name.toLowerCase();
 
-  // 1️⃣ Create the user (phone still stored)
-  await ClinicUser.create({ name, phone, password: hash });
-  console.log(`🆕 New user: ${name}`);
+    // 4) Check duplicate username (case-insensitive)
+    const existingUser = await ClinicUser.findOne({
+      name: new RegExp(`^${normalizedUsername}$`, "i")
+    });
 
+    if (existingUser) {
+      return res.render("signup", {
+        error: "This username is already taken. Please choose another one."
+      });
+    }
 
-  res.redirect("/login");
+    // 5) Save password AS PLAIN STRING (NO HASHING)
+    await ClinicUser.create({
+      name: normalizedUsername,  // stored lowercase
+      displayName,               // friendly name shown in UI
+      phone,
+      password                   // saved as plain string
+    });
+
+    console.log(` New user created: ${normalizedUsername}`);
+
+    // 5) Sync with API
+    await axios.post(`${BACKEND_API}/users/register`, {
+      userName: normalizedUsername,
+      displayName,
+      phone
+    });
+
+    console.log("🔄 Synced user to API:", normalizedUsername);
+
+    res.redirect("/login");
+
+  } catch (err) {
+    console.error("Signup error:", err);
+    return res.render("signup", { error: "Server error" });
+  }
 });
+
 
 // === Connect Telegram page ===
 app.get("/connect-telegram", (req, res) => {
-  const { name } = req.query;
-  if (!name) return res.redirect("/login");
-  res.render("connect-telegram", { name, phone: req.query.phone });;
+  const { name, phone } = req.query;
+
+  // Redirect if required fields are missing
+  if (!name || !phone) return res.redirect("/login");
+
+  // Render page with correct data
+  res.render("connect-telegram", { name, phone });
 });
+
 
 app.get("/check-telegram", async (req, res) => {
   const user = await ClinicUser.findOne({ name: req.query.user });
@@ -77,26 +121,35 @@ app.get("/login", (req, res) => {
   res.render("login", { error: null });
 });
 
-// Handle login (supports hard-coded admin + normal users)
+// Handle login
 app.post("/login", async (req, res) => {
   const { name, password } = req.body;
-  if (!name || !password) return res.render("login", { error: "Missing fields" });
+  if (!name || !password)
+    return res.render("login", { error: "Missing fields" });
 
-  // --- Simple admin shortcut (for local testing only) ---
-  // NOTE: storing plaintext creds in code is only for quick local testing.
-  // For anything beyond testing, move these to environment variables.
+  // --- Admin quick login ---
   if (name === "admin" && password === "1234") {
     return res.redirect("/admin/dashboard");
   }
 
-  // --- Normal user login using bcrypt hashes ---
   try {
-    const user = await ClinicUser.findOne({ name });
-    if (!user) return res.render("login", { error: "User not found" });
+    // Convert username to lowercase (because we stored it lowercase)
+    const normalizedUsername = name.toLowerCase();
 
-    const ok = await bcrypt.compare(password, user.password);
-    if (!ok) return res.render("login", { error: "Wrong password" });
+    // Find user case-insensitive
+    const user = await ClinicUser.findOne({
+      name: normalizedUsername
+    });
 
+    if (!user)
+      return res.render("login", { error: "User not found" });
+
+    // Compare plain text password (because you removed hashing)
+    const ok = password === user.password;
+    if (!ok)
+      return res.render("login", { error: "Wrong password" });
+
+    // Success → redirect to user UI
     return res.redirect(
       `/user/available?userName=${encodeURIComponent(user.name)}&phone=${user.phone}`
     );
@@ -107,12 +160,24 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// === User Pages ===
-app.get("/user/available", (req, res) => {
+app.get("/user/available", async (req, res) => {
   const { userName, phone } = req.query;
-  if (!phone) return res.redirect("/login");
-  res.render("user/available", { API: BACKEND_API, userName, phone });
+  if (!userName) return res.redirect("/login");  // safer check
+
+  const user = await ClinicUser.findOne({ name: userName });
+
+  const displayName = user?.displayName || userName;
+
+  res.render("user/available", {
+    API: BACKEND_API,
+    userName,
+    phone,
+    displayName
+  });
 });
+
+
+
 
 app.get("/user/booked", (req, res) => {
   const { userName, phone } = req.query;
