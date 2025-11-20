@@ -40,13 +40,14 @@ function setupAvailablePage(API, userName, phone) {
             "✅ Telegram connected – you will receive reminders.";
         } else {
           tgStatus.innerHTML = `
-            ⚠️ Telegram NOT connected yet.<br>
-            <a href="/connect-telegram?name=${encodeURIComponent(userName)}"
-               class="btn btn-sm btn-warning mt-2">
-              Connect Telegram
-            </a>
-          `;
+    ⚠️ Telegram NOT connected yet.<br>
+    <a href="/connect-telegram?name=${encodeURIComponent(userName)}&phone=${encodeURIComponent(phone)}"
+       class="btn btn-sm btn-warning mt-2">
+      Connect Telegram
+    </a>
+  `;
         }
+
       })
       .catch(() => {
         tgStatus.textContent = "❌ Unable to check Telegram status.";
