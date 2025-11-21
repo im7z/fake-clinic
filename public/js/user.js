@@ -187,11 +187,9 @@ function setupDoctorsPage(API, userName, phone) {
 }
 
 
-
 // ==============================
 // 3️⃣ Times Page (Booking)
 // ==============================
-function setupTimesPage(API, doctor, userName, phone) {
 function setupTimesPage(API, doctor, userName, phone) {
   const slotsDiv = document.getElementById("slots");
   const dateFiltersDiv = document.getElementById("dateFilters");
@@ -307,68 +305,66 @@ function setupTimesPage(API, doctor, userName, phone) {
   loadSlots();
 }
 
-  // BOOKING LOGIC
-  window.bookSlot = async id => {
+// ==============================
+// Booking Logic
+// ==============================
+window.bookSlot = async id => {
+  try {
+    // 1️⃣ Check Telegram link status
+    let linked = false;
+
     try {
-      // 1️⃣ Check Telegram link status
-      let linked = false;
-      try {
-        const check = await fetch(`${API}/users/${encodeURIComponent(userName)}`);
-        if (check.ok) {
-          const userData = await check.json();
-          linked = !!userData.telegramLinked;
-        }
-      } catch {
-        linked = false;
+      const check = await fetch(`${API}/users/${encodeURIComponent(userName)}`);
+      if (check.ok) {
+        const userData = await check.json();
+        linked = !!userData.telegramLinked;
       }
+    } catch {}
 
-      if (!linked) {
-        showUserPopup(
-          "يبدو أنك لم تقم بربط حسابك مع تيليغرام بعد.\n\nمن فضلك افتح البوت واكتب اسم المستخدم الخاص بك لإتمام الربط.",
-          "ربط تيليغرام مطلوب"
-        );
-        return (window.location.href = `/connect-telegram?name=${encodeURIComponent(
-          userName
-        )}&phone=${encodeURIComponent(phone)}`);
-      }
-
-      // 2️⃣ Book the appointment
-      const res = await fetch(`${API}/appointments/book/${id}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userName, phone }),
-      });
-
-      const msg = await res.json();
-
-      // If API returns error (high demand / restricted / etc.)
-      if (!res.ok) {
-        showUserPopup(
-          msg.message || "تعذّر حجز الموعد. الرجاء اختيار وقت آخر.",
-          "تنبيه"
-        );
-        return;
-      }
-
-      // Success
+    if (!linked) {
       showUserPopup(
-        msg.message || "تم حجز الموعد بنجاح ✅",
-        "حجز الموعد"
+        "يبدو أنك لم تقم بربط حسابك مع تيليغرام بعد.\n\nمن فضلك افتح البوت واكتب اسم المستخدم الخاص بك لإتمام الربط.",
+        "ربط تيليغرام مطلوب"
       );
-
-      setTimeout(() => {
-        window.location.href = `/user/available?userName=${encodeURIComponent(
-          userName
-        )}&phone=${encodeURIComponent(phone)}`;
-      }, 2500);
-    } catch (err) {
-      console.error("Booking failed:", err);
-      showUserPopup("فشل حجز الموعد، الرجاء المحاولة مرة أخرى.", "خطأ");
+      return (window.location.href = `/connect-telegram?name=${encodeURIComponent(
+        userName
+      )}&phone=${encodeURIComponent(phone)}`);
     }
-  };
 
-  loadSlots();
-}
+    // 2️⃣ Book the appointment
+    const res = await fetch(`${API}/appointments/book/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userName, phone }),
+    });
+
+    const msg = await res.json();
+
+    if (!res.ok) {
+      showUserPopup(
+        msg.message || "تعذّر حجز الموعد. الرجاء اختيار وقت آخر.",
+        "تنبيه"
+      );
+      return;
+    }
+
+    showUserPopup(
+      msg.message || "تم حجز الموعد بنجاح ✅",
+      "حجز الموعد"
+    );
+
+    setTimeout(() => {
+      window.location.href = `/user/available?userName=${encodeURIComponent(
+        userName
+      )}&phone=${encodeURIComponent(phone)}`;
+    }, 2500);
+
+  } catch (err) {
+    console.error("Booking failed:", err);
+    showUserPopup("فشل حجز الموعد، الرجاء المحاولة مرة أخرى.", "خطأ");
+  }
+};
+
 
 
 
