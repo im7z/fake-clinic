@@ -192,59 +192,120 @@ function setupDoctorsPage(API, userName, phone) {
 // 3️⃣ Times Page (Booking)
 // ==============================
 function setupTimesPage(API, doctor, userName, phone) {
+function setupTimesPage(API, doctor, userName, phone) {
   const slotsDiv = document.getElementById("slots");
+  const dateFiltersDiv = document.getElementById("dateFilters");
 
   async function loadSlots() {
     slotsDiv.innerHTML = "Loading available times...";
+
     try {
       const res = await fetch(`${API}/appointments/available?ts=${Date.now()}`);
       const data = await res.json();
 
-      const slots = data.slots.filter(s => s.doctorName === doctor);
+      // Filter by doctor
+      let slots = data.slots.filter(s => s.doctorName === doctor);
 
-      if (slots.length === 0) {
-        slotsDiv.innerHTML = "<p>No available times right now.</p>";
-        return;
-      }
+      // Sort by date ascending
+      slots.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-      slotsDiv.innerHTML = slots
-        .map(s => {
-          const d = new Date(s.date);
+      // Build UNIQUE list of days
+      const days = [...new Set(slots.map(s =>
+        new Date(s.date).toDateString()
+      ))];
 
-          const time = d.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit"
-          });
-
-          const monthDay = d.toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric"
-          });
-
-          const weekday = d.toLocaleDateString("en-US", {
-            weekday: "long"
-          });
-
-          const finalDate = `${monthDay} • ${weekday}`;
-
-          return `
-      <div class="time-card">
-        <div class="time-content">
-          <p class="time-hour">${time}</p>
-          <p class="time-date">${finalDate}</p>
-        </div>
-        <button class="btn btn-primary btn-sm w-100 mt-2" onclick="bookSlot('${s._id}')">
-          Book
+      // Render date buttons
+      dateFiltersDiv.innerHTML = `
+        <button class="btn btn-secondary btn-sm me-2" onclick="filterByDay(null)">
+          All
         </button>
-      </div>
-    `;
-        })
-        .join("");
+        ${days
+          .map(d => {
+            const dayLabel = new Date(d).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              weekday: "short",
+            });
+            return `
+              <button class="btn btn-outline-primary btn-sm me-2"
+                      onclick="filterByDay('${d}')">
+                ${dayLabel}
+              </button>
+            `;
+          })
+          .join("")}
+      `;
+
+      // Save slots in window to reuse
+      window.allSlots = slots;
+
+      // Render all slots first
+      renderSlots(slots);
+
     } catch (err) {
       console.error("Error loading times:", err);
       slotsDiv.innerHTML = `<p class="text-danger">Failed to load times.</p>`;
     }
   }
+
+  // Render function
+  function renderSlots(slots) {
+    if (!slots || slots.length === 0) {
+      slotsDiv.innerHTML = "<p>No available times right now.</p>";
+      return;
+    }
+
+    slotsDiv.innerHTML = slots
+      .map(s => {
+        const d = new Date(s.date);
+
+        const time = d.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+        const monthDay = d.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric"
+        });
+
+        const weekday = d.toLocaleDateString("en-US", {
+          weekday: "long"
+        });
+
+        const finalDate = `${monthDay} • ${weekday}`;
+
+        return `
+        <div class="time-card">
+          <div class="time-content">
+            <p class="time-hour">${time}</p>
+            <p class="time-date">${finalDate}</p>
+          </div>
+          <button class="btn btn-primary btn-sm w-100 mt-2"
+                  onclick="bookSlot('${s._id}')">
+            Book
+          </button>
+        </div>
+      `;
+      })
+      .join("");
+  }
+
+  // Filter by day function
+  window.filterByDay = function (dayString) {
+    if (!dayString) {
+      return renderSlots(window.allSlots);
+    }
+
+    const filtered = window.allSlots.filter(s =>
+      new Date(s.date).toDateString() === dayString
+    );
+
+    renderSlots(filtered);
+  };
+
+  loadSlots();
+}
 
   // BOOKING LOGIC
   window.bookSlot = async id => {
