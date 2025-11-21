@@ -97,14 +97,20 @@ async function loadAvailableSlots() {
   const render = (slots) => {
     tbody.innerHTML = slots.length
       ? slots.map(s => `
-          <tr>
-            <td>${s.doctorName}</td>
-            <td>${new Date(s.date).toLocaleDateString()}</td>
-            <td>${new Date(s.date).toLocaleTimeString()}</td>
-            <td>${s.status}</td>
-          </tr>
-        `).join("")
-      : "<tr><td colspan='4' class='text-center text-muted'>No available slots</td></tr>";
+        <tr>
+          <td>${s.doctorName}</td>
+          <td>${new Date(s.date).toLocaleDateString()}</td>
+          <td>${new Date(s.date).toLocaleTimeString()}</td>
+          <td>${s.status}</td>
+          <td>
+            <button class="btn btn-danger btn-sm"
+                    onclick="deleteSlot('${s._id}')">
+              Delete
+            </button>
+          </td>
+        </tr>
+      `).join("")
+      : "<tr><td colspan='5' class='text-center text-muted'>No available slots</td></tr>";
   };
 
   render(data.slots);
@@ -116,8 +122,12 @@ async function loadAvailableSlots() {
   });
 
   // Add Appointment Block
-  document.getElementById("addForm").addEventListener("submit", async (e) => {
+  const addForm = document.getElementById("addForm");
+  addForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    const submitBtn = addForm.querySelector("button[type=submit]");
+    submitBtn.disabled = true; //  prevent double submit
 
     const doctorName = document.getElementById("doctorName").value.trim();
     const startDate = document.getElementById("startDate").value;
@@ -128,6 +138,7 @@ async function loadAvailableSlots() {
 
     if (!doctorName || !startDate || !startTime) {
       showAdminPopup("الرجاء إدخال اسم الطبيب، وتاريخ البداية، ووقت البداية.", "حقول ناقصة");
+      submitBtn.disabled = false;
       return;
     }
 
@@ -150,33 +161,54 @@ async function loadAvailableSlots() {
         }),
       });
 
-      const data = await res.json();
+      const response = await res.json();
 
-      // ✅ FIX: If API returned an error → show error popup and STOP
       if (!res.ok) {
-        showAdminPopup(data.error || "حدث خطأ أثناء إضافة المواعيد.", "خطأ");
+        showAdminPopup(response.error || "حدث خطأ أثناء إضافة المواعيد.", "خطأ");
+        submitBtn.disabled = false;
         return;
       }
 
-      // ✅ Success
-      showAdminPopup(
-        data.message || "تمت إضافة المواعيد بنجاح.",
-        "تمت الإضافة"
-      );
+      showAdminPopup(response.message || "تمت إضافة المواعيد بنجاح.", "تمت الإضافة");
 
       const modal = bootstrap.Modal.getInstance(document.getElementById("addModal"));
       modal.hide();
 
-      loadAvailableSlots();
+      await loadAvailableSlots();
 
     } catch (err) {
       console.error("Error adding block:", err);
       showAdminPopup("حدث خطأ أثناء إضافة المواعيد، الرجاء المحاولة مرة أخرى.", "خطأ");
     }
-  });
 
+    submitBtn.disabled = false; // 🔥 Reset here (correct place)
+  });
 }
 
+window.deleteSlot = async function (id) {
+  if (!confirm("Are you sure you want to delete this appointment slot?")) return;
+
+  try {
+    const res = await fetch(`${API}/appointments/delete/${id}`, {
+      method: "DELETE"
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return showAdminPopup(data.error || "Failed to delete slot.", "Error");
+    }
+
+    showAdminPopup("Appointment slot deleted successfully.", "Deleted");
+
+    // reload table
+    loadAvailableSlots();
+
+  } catch (err) {
+    console.error("Delete error:", err);
+    showAdminPopup("Server error. Could not delete appointment slot.", "Error");
+  }
+};
 
 // =======================================================
 //   3) BOOKED PAGE (UPGRADED TO CARD VIEW)
@@ -538,12 +570,18 @@ window.saveCategory = async function () {
       body: JSON.stringify({ userName: currentUser, category: newCat })
     });
 
+    // Close modal immediately so popup can show
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("categoryModal")
+    );
+    if (modal) modal.hide();
+
     showAdminPopup(
       `تم تحديث فئة المستخدم (${currentUser}) إلى: ${newCat}`,
       "تم التحديث"
     );
 
-    setTimeout(() => location.reload(), 900);
+    setTimeout(() => location.reload(), 1500);
 
   } catch (err) {
     showAdminPopup("فشل تحديث الفئة، الرجاء المحاولة مرة أخرى.", "خطأ");
