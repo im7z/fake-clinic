@@ -279,8 +279,7 @@ function setupTimesPage(API, doctor, userName, phone) {
             <p class="time-hour">${time}</p>
             <p class="time-date">${finalDate}</p>
           </div>
-          <button class="btn btn-primary btn-sm w-100 mt-2"
-                  onclick="bookSlot('${s._id}')">
+          <button onclick="bookSlot('${s._id}', '${userName}', '${phone}')">
             Book
           </button>
         </div>
@@ -308,7 +307,7 @@ function setupTimesPage(API, doctor, userName, phone) {
 // ==============================
 // Booking Logic
 // ==============================
-window.bookSlot = async id => {
+window.bookSlot = async (id, userName, phone) => {
   try {
     // 1️⃣ Check Telegram link status
     let linked = false;
@@ -335,7 +334,7 @@ window.bookSlot = async id => {
     const res = await fetch(`${API}/appointments/book/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userName, phone }),
+      body: JSON.stringify({ userName: userName.toLowerCase(), phone }),
     });
 
     const msg = await res.json();
