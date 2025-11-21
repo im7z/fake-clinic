@@ -279,9 +279,13 @@ function setupTimesPage(API, doctor, userName, phone) {
             <p class="time-hour">${time}</p>
             <p class="time-date">${finalDate}</p>
           </div>
-          <button onclick="bookSlot('${s._id}', '${userName}', '${phone}')">
-            Book
-          </button>
+          <button 
+  onclick="bookSlot('${s._id}', GLOBAL_API, '${userName}', '${phone}')"
+  class="btn btn-primary btn-sm w-100 mt-2"
+>
+  Book
+</button>
+
         </div>
       `;
       })
@@ -307,7 +311,7 @@ function setupTimesPage(API, doctor, userName, phone) {
 // ==============================
 // Booking Logic
 // ==============================
-window.bookSlot = async (id, userName, phone) => {
+window.bookSlot = async (id, API, userName, phone) => {
   try {
     // 1️⃣ Check Telegram link status
     let linked = false;
@@ -318,7 +322,7 @@ window.bookSlot = async (id, userName, phone) => {
         const userData = await check.json();
         linked = !!userData.telegramLinked;
       }
-    } catch {}
+    } catch { }
 
     if (!linked) {
       showUserPopup(
